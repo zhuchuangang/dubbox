@@ -23,6 +23,7 @@ import com.alibaba.dubbo.remoting.http.servlet.BootstrapListener;
 import com.alibaba.dubbo.remoting.http.servlet.ServletManager;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.protocol.rest.support.BodyReaderHttpServletRequestWrapper;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 
@@ -83,7 +84,8 @@ public class DubboHttpServer extends BaseRestServer {
 
         public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
             RpcContext.getContext().setRemoteAddress(request.getRemoteAddr(), request.getRemotePort());
-            dispatcher.service(request, response);
+            BodyReaderHttpServletRequestWrapper requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
+            DubboHttpServer.this.dispatcher.service(requestWrapper, response);
         }
     }
 
