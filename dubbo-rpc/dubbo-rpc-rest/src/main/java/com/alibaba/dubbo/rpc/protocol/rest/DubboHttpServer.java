@@ -32,6 +32,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -84,8 +85,12 @@ public class DubboHttpServer extends BaseRestServer {
 
         public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
             RpcContext.getContext().setRemoteAddress(request.getRemoteAddr(), request.getRemotePort());
-            BodyReaderHttpServletRequestWrapper requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
-            DubboHttpServer.this.dispatcher.service(requestWrapper, response);
+            if (request.getContentType() != null && request.getContentType().contains(MediaType.MULTIPART_FORM_DATA)) {
+                DubboHttpServer.this.dispatcher.service(request, response);
+            } else {
+                BodyReaderHttpServletRequestWrapper requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
+                DubboHttpServer.this.dispatcher.service(requestWrapper, response);
+            }
         }
     }
 
